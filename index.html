@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Võ Sinh - Phật Quang Quyền</title>
+    
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-color: #8b0000; /* Đỏ sậm truyền thống */
+            --accent-color: #FFD700; /* Vàng kim làm viền ảnh */
+            --hover-color: #f2f2f2;
+            --border-color: #e0e0e0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow-x: auto; 
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+        
+        /* Cụm Điều khiển: Tổng số & Tìm kiếm */
+        .controls-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .total-badge {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .search-box {
+            flex-grow: 1;
+            max-width: 500px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        #searchInput:focus {
+            border-color: var(--primary-color);
+        }
+        
+        /* Định dạng bảng lưới */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px; 
+        }
+        th, td {
+            padding: 12px 10px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        tr:hover {
+            background-color: var(--hover-color);
+        }
+        
+        /* Cột số thứ tự */
+        .col-stt {
+            text-align: center;
+            font-weight: bold;
+            width: 40px;
+        }
+        
+        /* Ảnh đại diện: Giữ nguyên hình chữ nhật, không bo tròn, có viền vàng */
+        .avatar-img {
+            width: 80px; 
+            height: auto; 
+            max-height: 110px; 
+            object-fit: contain; 
+            border: 3px solid var(--accent-color); 
+            display: block;
+            margin: 0 auto;
+            background-color: #fff; 
+        }
+        .col-avatar {
+            width: 90px;
+            text-align: center;
+        }
+
+        /* Nhãn Trạng Thái */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .status-active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .status-pause {
+            background-color: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffcc80;
+        }
+        .status-stop {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        /* Nút xem chi tiết */
+        .btn-detail {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: background 0.3s;
+        }
+        .btn-detail:hover {
+            background-color: #660000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tổng Hợp Hồ Sơ Võ Sinh</h1>
+
+    <div class="controls-container">
+        <div class="total-badge" id="totalCountDisplay">
+            Tổng số võ sinh: 0
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 Tìm kiếm tên, pháp danh, năm, trạng thái...">
+        </div>
+    </div>
+
+    <table id="voSinhTable">
+        <thead>
+            <tr>
+                <th class="col-stt">STT</th>
+                <th class="col-avatar">Ảnh</th>
+                <th>Họ và Tên</th>
+                <th>Pháp Danh</th>
+                <th>Năm Sinh</th>
+                <th>Cấp Đai</th>
+                <th>Võ Đường / CLB</th>
+                <th>Trạng Thái</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="col-stt">1</td>
+                <td class="col-avatar">
+                    <img src="ledaianh.jpg" alt="Avatar" class="avatar-img" loading="lazy">
+                </td>
+                <td><strong>Lê Đại Anh</strong></td>
+                <td>Trung Kiến Pháp</td>
+                <td>1999</td>
+                <td>Cấp 13 - Hoàng Đai I</td>
+                <td>Võ Đường Trí Vũ</td>
+                <td><span class="status-badge status-active">Đang hoạt động</span></td>
+                <td>
+                    <a href="https://lelevietnam99.github.io/ledaianh-1999-danang-voduongtrivu/" class="btn-detail" target="_blank">Chi tiết ↗</a>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-stt">2</td>
+                <td class="col-avatar">
+                    <img src="ngoxuankhoa.jpg" alt="Avatar" class="avatar-img" loading="lazy">
+                </td>
+                <td><strong>Ngọ Xuân Khoa</strong></td>
+                <td>Chưa Có</td>
+                <td>2014</td>
+                <td>Cấp 1 - Lam Đai I</td>
+                <td>Võ Đường Trí Vũ</td>
+                <td><span class="status-badge status-pause">Tạm nghỉ</span></td>
+                <td>
+                    <a href="https://lelevietnam99.github.io/ngoxuankhoa-2014-hanoi-voduongtrivu/" class="btn-detail" target="_blank">Chi tiết ↗</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td class="col-stt">3</td>
+                <td class="col-avatar">
+                    <img src="phandinhkhoa.jpg" alt="Avatar" class="avatar-img" loading="lazy">
+                </td>
+                <td><strong>Phan Đình Khoa</strong></td>
+                <td>Trung Thuận Khánh</td>
+                <td>2002</td>
+                <td>Cấp 14 - Hoàng Đai II</td>
+                <td>CLB Pleiku Xanh - Võ Đường Trí Vũ</td>
+                <td><span class="status-badge status-stop">Đã nghỉ</span></td>
+                <td>
+                    <a href="https://lelevietnam99.github.io/phandinhkhoa-2002-lamdong-clbpleikuxanh-voduongtrivu/" class="btn-detail" target="_blank">Chi tiết ↗</a>
+                </td>
+            </tr>
+            
+            </tbody>
+    </table>
+</div>
+
+<script>
+    // Hàm đếm và cập nhật số lượng hiển thị
+    function updateTotalCount(count) {
+        document.getElementById("totalCountDisplay").innerHTML = "Tổng số võ sinh: <strong>" + count + "</strong>";
+    }
+
+    // Script hỗ trợ tìm kiếm đa luồng và đếm số lượng
+    function searchTable() {
+        let input = document.getElementById("searchInput");
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById("voSinhTable");
+        let tr = table.getElementsByTagName("tr");
+        let visibleCount = 0;
+
+        for (let i = 1; i < tr.length; i++) { 
+            // Gộp dữ liệu tất cả các cột cần tìm kiếm thành 1 chuỗi để quét cho lẹ
+            let rowData = "";
+            for (let j = 2; j <= 7; j++) { // Quét từ cột Họ tên (2) đến cột Trạng thái (7)
+                let td = tr[i].getElementsByTagName("td")[j];
+                if (td) {
+                    rowData += (td.textContent || td.innerText) + " ";
+                }
+            }
+            
+            if (rowData) {
+                if (rowData.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    visibleCount++; // Tăng biến đếm nếu dòng này thỏa mãn điều kiện tìm kiếm
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }       
+        }
+        
+        // Cập nhật lại con số hiển thị
+        updateTotalCount(visibleCount);
+    }
+
+    // Tự động đếm tổng số khi vừa load trang xong
+    window.onload = function() {
+        let table = document.getElementById("voSinhTable");
+        let totalRows = table.getElementsByTagName("tr").length - 1; // Trừ đi dòng tiêu đề
+        updateTotalCount(totalRows);
+    };
+</script>
+
+</body>
+</html>
